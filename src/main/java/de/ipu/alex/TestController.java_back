@@ -1,0 +1,17 @@
+package de.ipu.alex;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+public class TestController implements TestApi {
+
+    @ResponseBody
+    @Override
+    @PreAuthorize("hasAnyAuthority('test')")
+    public ResponseEntity<TestDto> test(UUID id) {
+        return null
+    }
+}

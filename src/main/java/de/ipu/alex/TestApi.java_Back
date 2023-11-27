@@ -1,0 +1,66 @@
+package de.ipu.alex;
+
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.NativeWebRequest;
+
+import java.util.Iterator;
+import java.util.Optional;
+
+@Validated
+@Tag(
+        name = "test",
+        description = "the test API"
+)
+public interface TestApi {
+    default Optional<NativeWebRequest> getRequest() {
+        return Optional.empty();
+    }
+
+    @Operation(
+            operationId = "test",
+            responses = {@ApiResponse(
+                    responseCode = "201",
+                    description = "Test",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = TestDto.class
+                            )
+                    )}
+            ), @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorisiert."
+            )},
+            security = {@SecurityRequirement(
+                    name = "OAuth2",
+                    scopes = {"ama"}
+            )}
+    )
+    @RequestMapping(
+            method = {RequestMethod.POST},
+            value = {"/test/{id}"},
+            produces = {"application/json"}
+    )
+    default ResponseEntity<TestDto> te_st(@Parameter(name = "id", description = "ID des Test", required = true) @PathVariable("id") UUID id) {
+        return this.test(id);
+    }
+
+
+    default ResponseEntity<TestDto> test(UUID id) {
+        this.getRequest().ifPresent((request) -> {
+            Iterator var1 = MediaType.parseMediaTypes(request.getHeader("Accept")).iterator();
+
+            while (var1.hasNext()) {
+                MediaType mediaType = (MediaType) var1.next();
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = (new StringBuilder(140840)).append("Test");
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+
+        });
+        return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
+    }
+}
